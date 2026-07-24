@@ -1,0 +1,50 @@
+[
+  {
+    "id": "t1_compound_interest",
+    "category": "multi-step arithmetic",
+    "prompt": "You invest $4,200 at an annual compound interest rate of 6.5%, compounded yearly. What is the balance after 7 years, rounded to the nearest cent?",
+    "expected_answer": "6526.74"
+  },
+  {
+    "id": "t2_median_from_text",
+    "category": "parsing + statistics",
+    "prompt": "A lab recorded these reaction times in milliseconds across 11 trials: 214, 198, 231, 205, 260, 199, 222, 241, 189, 250, 217. What is the median reaction time?",
+    "expected_answer": "217"
+  },
+  {
+    "id": "t3_threshold_count",
+    "category": "filtering",
+    "prompt": "Daily high temperatures (Celsius) for two weeks: 21, 24, 19, 27, 30, 22, 18, 26, 31, 20, 23, 29, 17, 25. On how many of these days was the high strictly above 24 degrees?",
+    "expected_answer": "6"
+  },
+  {
+    "id": "t4_table_aggregate",
+    "category": "table parsing",
+    "prompt": "A small inventory table:\nname,category,qty,price\nwidgetA,tools,12,3.50\nwidgetB,tools,5,7.25\ngadgetC,parts,20,1.10\ngadgetD,parts,8,2.75\nwidgetE,tools,3,9.00\nWhat is the total value (qty * price, summed) of all items in the 'tools' category?",
+    "expected_answer": "105.25"
+  },
+  {
+    "id": "t5_word_puzzle",
+    "category": "string processing",
+    "prompt": "Take the sentence: 'Curious biologists quietly examine rare orchids near flooded gullies.' Count how many words contain at least two vowels that are not adjacent to each other (i.e. separated by at least one consonant).",
+    "expected_answer": "8"
+  },
+  {
+    "id": "t6_unit_conversion",
+    "category": "unit conversion",
+    "prompt": "A drone flies at a constant speed of 42 km/h for 25 minutes, then at 18 km/h for 40 minutes. What total distance, in meters, does it travel? Round to the nearest whole meter.",
+    "expected_answer": "29500"
+  },
+  {
+    "id": "t7_date_arithmetic",
+    "category": "date logic",
+    "prompt": "If a lab sample is collected on Friday, March 6, 2026, and must be analyzed exactly 45 days later, what day of the week is the analysis due?",
+    "expected_answer": "Monday"
+  },
+  {
+    "id": "t8_combinatorics",
+    "category": "combinatorics",
+    "prompt": "A review committee has 9 biologists. A panel of 3 must be selected, but two specific biologists (Dr. Ansel and Dr. Ibarra) refuse to serve on the same panel together. How many valid 3-person panels are possible?",
+    "expected_answer": "77"
+  }
+]
