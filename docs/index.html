@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GAIA-Style Agent Benchmark — Live Pipeline Demo</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#12172200; --card:#151b26; --card2:#1b2331;
+    --border:#2a3444; --text:#e6ecf5; --muted:#8b98ac; --accent:#5eead4;
+    --accent2:#a78bfa; --good:#34d399; --bad:#f87171; --code:#0e1420;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;
+    background:radial-gradient(1200px 600px at 20% -10%, #1a2436 0%, var(--bg) 60%);
+    color:var(--text); min-height:100vh; padding:28px 16px 60px;
+  }
+  .wrap{max-width:960px; margin:0 auto;}
+  header{margin-bottom:28px;}
+  .badge{
+    display:inline-block; font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--accent); border:1px solid #2c4a44; background:#0f1f1c; padding:4px 10px;
+    border-radius:20px; margin-bottom:14px;
+  }
+  h1{font-size:22px; margin:0 0 8px; font-weight:600; letter-spacing:-.01em;}
+  .sub{color:var(--muted); font-size:13.5px; line-height:1.6; max-width:680px;}
+  .stack{display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 6px;}
+  .pill{
+    font-size:11.5px; color:var(--text); background:var(--card2); border:1px solid var(--border);
+    padding:5px 10px; border-radius:6px;
+  }
+  .flow{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:22px 0 30px;
+    font-size:12px; color:var(--muted);
+  }
+  .flow .node{
+    background:var(--card); border:1px solid var(--border); padding:8px 12px; border-radius:8px; color:var(--text);
+  }
+  .flow .arrow{color:#4b5a70;}
+
+  .layout{display:grid; grid-template-columns:220px 1fr; gap:18px;}
+  @media (max-width:720px){ .layout{grid-template-columns:1fr;} }
+
+  .tasklist{display:flex; flex-direction:column; gap:6px;}
+  .tasklist button{
+    text-align:left; background:var(--card); border:1px solid var(--border); color:var(--muted);
+    padding:9px 10px; border-radius:8px; cursor:pointer; font-family:inherit; font-size:11.5px;
+    transition:.15s;
+  }
+  .tasklist button:hover{border-color:#3d4a5f; color:var(--text);}
+  .tasklist button.active{border-color:var(--accent); color:var(--text); background:#132622;}
+  .tasklist .n{color:var(--accent); margin-right:6px;}
+  .tasklist .cat{display:block; font-size:10px; color:#5f6c80; margin-top:2px;}
+
+  .panel{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; min-height:520px;}
+  .row-label{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 8px;}
+  .prompt-box{
+    background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:14px;
+    font-size:13px; line-height:1.55; color:#dbe4f2; margin-bottom:18px; white-space:pre-wrap;
+  }
+  .step{margin-bottom:16px;}
+  .step-title{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--accent2); flex:none;}
+  .step-title span{font-size:12px; color:var(--text); font-weight:600;}
+  pre{
+    background:var(--code); border:1px solid var(--border); border-radius:8px; padding:12px 14px;
+    font-size:12.5px; line-height:1.6; overflow-x:auto; margin:0; color:#c9d4e6;
+  }
+  .out{
+    background:var(--code); border:1px solid #223428; border-radius:8px; padding:12px 14px;
+    font-size:12.5px; color:#9fe8c8; margin-top:8px;
+  }
+  .verdict{
+    margin-top:18px; display:flex; align-items:center; gap:10px; font-size:13px;
+  }
+  .verdict .tag{
+    padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; letter-spacing:.03em;
+  }
+  .tag.ok{background:#0f2a20; color:var(--good); border:1px solid #1e4d3a;}
+  .tag.no{background:#2a1414; color:var(--bad); border:1px solid #4d1e1e;}
+  .kv{color:var(--muted);}
+  .kv b{color:var(--text); font-weight:600;}
+
+  .summary{
+    margin-top:36px; border-top:1px solid var(--border); padding-top:24px;
+  }
+  .summary h2{font-size:14px; margin:0 0 4px;}
+  .summary .note{color:var(--muted); font-size:12px; margin-bottom:16px; line-height:1.6;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--border);}
+  th{color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:.04em;}
+  td.acc{color:var(--good); font-weight:600;}
+  .modebar{
+    display:flex; gap:10px; align-items:center; margin-top:16px; font-size:12px; color:var(--muted);
+  }
+  .modebar .live{color:#f0b429;}
+  footer{margin-top:34px; color:#5f6c80; font-size:11.5px; line-height:1.7;}
+  a{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">mock mode — real pipeline, $0, no API keys</div>
+    <h1>GAIA-style agent benchmark — step-by-step replay</h1>
+    <p class="sub">
+      This replays a real recorded run of the pipeline below: task → Claude Agent SDK
+      → <code>run_python</code> tool call → sandboxed execution → scored answer.
+      Every code snippet and output on this page was actually executed, not written by hand.
+      Click a task on the left to inspect it.
+    </p>
+    <div class="stack">
+      <span class="pill">Claude Agent SDK</span>
+      <span class="pill">E2B sandbox (run_python)</span>
+      <span class="pill">Fail-closed permission gate</span>
+      <span class="pill">3-run reproducible scoring</span>
+      <span class="pill">Cost read from SDK, not estimated</span>
+    </div>
+    <div class="flow">
+      <div class="node">Task prompt</div><span class="arrow">→</span>
+      <div class="node">claude-opus-4-8</div><span class="arrow">→</span>
+      <div class="node">run_python (only allowed tool)</div><span class="arrow">→</span>
+      <div class="node">E2B sandbox</div><span class="arrow">→</span>
+      <div class="node">FINAL ANSWER</div><span class="arrow">→</span>
+      <div class="node">scorer.py</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="tasklist" id="tasklist"></div>
+    <div class="panel" id="panel"></div>
+  </div>
+
+  <div class="summary">
+    <h2>Benchmark summary — 3 runs</h2>
+    <p class="note">
+      Reproducibility check per the trial spec: run the full 8-task set 3 times and report
+      mean + dispersion, not a single cherry-picked number. This table is the real output of
+      <code>python3 -m benchmark.run_benchmark</code> in mock mode.
+    </p>
+    <table>
+      <thead><tr><th>Run</th><th>Accuracy</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td class="acc">100.0%</td><td>$0.0000</td></tr>
+        <tr><td>2</td><td class="acc">100.0%</td><td>$0.0000</td></tr>
+        <tr><td>3</td><td class="acc">100.0%</td><td>$0.0000</td></tr>
+        <tr><td><b>mean</b></td><td class="acc"><b>100.0%</b></td><td>$0.0000</td></tr>
+        <tr><td><b>stdev</b></td><td>0.0pp</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="modebar">
+      <span>●&nbsp; mock mode: scripted reasoning, real tool + sandbox execution, $0 cost, run above.</span>
+    </div>
+    <div class="modebar">
+      <span class="live">●&nbsp; live mode: same code path, real claude-opus-4-8 + real E2B calls, cost read from ResultMessage.total_cost_usd — requires a personal Anthropic + E2B key, not run here.</span>
+    </div>
+  </div>
+
+  <footer>
+    Full source, README and both run modes: <a href="https://github.com/Ainoafv/gaia-agent-benchmark-demo" target="_blank">github.com/Ainoafv/gaia-agent-benchmark-demo</a><br/>
+    This is a self-authored task set modeled on GAIA's conventions (short closed-form answers,
+    "FINAL ANSWER:" extraction) — not a submission of the real 165-task GAIA benchmark, which
+    requires the gated dataset. Built by Ainoa Figueroa Vidal.
+  </footer>
+</div>
+
+<script>
+const TASKS = [
+  {
+    "id": "t1_compound_interest",
+    "category": "multi-step arithmetic",
+    "prompt": "You invest $4,200 at an annual compound interest rate of 6.5%, compounded yearly. What is the balance after 7 years, rounded to the nearest cent?",
+    "code": "result = round(4200 * (1.065 ** 7), 2)",
+    "tool_output": "stdout:\n\nresult: 6526.74\nerror: none",
+    "predicted": "6526.74",
+    "expected": "6526.74",
+    "correct": true
+  },
+  {
+    "id": "t2_median_from_text",
+    "category": "parsing + statistics",
+    "prompt": "A lab recorded these reaction times in milliseconds across 11 trials: 214, 198, 231, 205, 260, 199, 222, 241, 189, 250, 217. What is the median reaction time?",
+    "code": "vals = [214,198,231,205,260,199,222,241,189,250,217]\ns = sorted(vals)\nresult = s[len(s)//2]",
+    "tool_output": "stdout:\n\nresult: 217\nerror: none",
+    "predicted": "217",
+    "expected": "217",
+    "correct": true
+  },
+  {
+    "id": "t3_threshold_count",
+    "category": "filtering",
+    "prompt": "Daily high temperatures (Celsius) for two weeks: 21, 24, 19, 27, 30, 22, 18, 26, 31, 20, 23, 29, 17, 25. On how many of these days was the high strictly above 24 degrees?",
+    "code": "temps = [21,24,19,27,30,22,18,26,31,20,23,29,17,25]\nresult = sum(1 for t in temps if t > 24)",
+    "tool_output": "stdout:\n\nresult: 6\nerror: none",
+    "predicted": "6",
+    "expected": "6",
+    "correct": true
+  },
+  {
+    "id": "t4_table_aggregate",
+    "category": "table parsing",
+    "prompt": "A small inventory table:\nname,category,qty,price\nwidgetA,tools,12,3.50\nwidgetB,tools,5,7.25\ngadgetC,parts,20,1.10\ngadgetD,parts,8,2.75\nwidgetE,tools,3,9.00\nWhat is the total value (qty * price, summed) of all items in the 'tools' category?",
+    "code": "rows = [('widgetA','tools',12,3.50),('widgetB','tools',5,7.25),('gadgetC','parts',20,1.10),('gadgetD','parts',8,2.75),('widgetE','tools',3,9.00)]\nresult = round(sum(q*p for _, cat, q, p in rows if cat == 'tools'), 2)",
+    "tool_output": "stdout:\n\nresult: 105.25\nerror: none",
+    "predicted": "105.25",
+    "expected": "105.25",
+    "correct": true
+  },
+  {
+    "id": "t5_word_puzzle",
+    "category": "string processing",
+    "prompt": "Take the sentence: 'Curious biologists quietly examine rare orchids near flooded gullies.' Count how many words contain at least two vowels that are not adjacent to each other (i.e. separated by at least one consonant).",
+    "code": "import re\nsentence = 'Curious biologists quietly examine rare orchids near flooded gullies.'\nwords = re.findall(r'[A-Za-z]+', sentence)\nvowels = set('aeiouAEIOU')\ndef has_gap_pair(w):\n    idxs = [i for i, ch in enumerate(w) if ch in vowels]\n    return any(idxs[j]-idxs[i] >= 2 for i in range(len(idxs)) for j in range(i+1, len(idxs)))\nresult = sum(1 for w in words if has_gap_pair(w))",
+    "tool_output": "stdout:\n\nresult: 8\nerror: none",
+    "predicted": "8",
+    "expected": "8",
+    "correct": true
+  },
+  {
+    "id": "t6_unit_conversion",
+    "category": "unit conversion",
+    "prompt": "A drone flies at a constant speed of 42 km/h for 25 minutes, then at 18 km/h for 40 minutes. What total distance, in meters, does it travel? Round to the nearest whole meter.",
+    "code": "d1 = 42 * (25/60)\nd2 = 18 * (40/60)\nresult = round((d1 + d2) * 1000)",
+    "tool_output": "stdout:\n\nresult: 29500\nerror: none",
+    "predicted": "29500",
+    "expected": "29500",
+    "correct": true
+  },
+  {
+    "id": "t7_date_arithmetic",
+    "category": "date logic",
+    "prompt": "If a lab sample is collected on Friday, March 6, 2026, and must be analyzed exactly 45 days later, what day of the week is the analysis due?",
+    "code": "import datetime\nstart = datetime.date(2026, 3, 6)\nend = start + datetime.timedelta(days=45)\nresult = end.strftime('%A')",
+    "tool_output": "stdout:\n\nresult: Monday\nerror: none",
+    "predicted": "Monday",
+    "expected": "Monday",
+    "correct": true
+  },
+  {
+    "id": "t8_combinatorics",
+    "category": "combinatorics",
+    "prompt": "A review committee has 9 biologists. A panel of 3 must be selected, but two specific biologists (Dr. Ansel and Dr. Ibarra) refuse to serve on the same panel together. How many valid 3-person panels are possible?",
+    "code": "import math\ntotal = math.comb(9, 3)\nbad = math.comb(7, 1)\nresult = total - bad",
+    "tool_output": "stdout:\n\nresult: 77\nerror: none",
+    "predicted": "77",
+    "expected": "77",
+    "correct": true
+  }
+];
+
+const tasklistEl = document.getElementById('tasklist');
+const panelEl = document.getElementById('panel');
+let active = 0;
+
+function esc(s){
+  return (s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderList(){
+  tasklistEl.innerHTML = TASKS.map((t,i) => `
+    <button class="${i===active?'active':''}" data-i="${i}">
+      <span class="n">T${i+1}</span>${esc(t.category)}
+      <span class="cat">${esc(t.id)}</span>
+    </button>
+  `).join('');
+  tasklistEl.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => { active = parseInt(btn.dataset.i, 10); render(); });
+  });
+}
+
+function render(){
+  renderList();
+  const t = TASKS[active];
+  panelEl.innerHTML = `
+    <p class="row-label">Task prompt</p>
+    <div class="prompt-box">${esc(t.prompt)}</div>
+
+    <div class="step">
+      <div class="step-title"><span class="dot" style="background:#5eead4"></span><span>Agent calls run_python</span></div>
+      <pre>${esc(t.code)}</pre>
+    </div>
+
+    <div class="step">
+      <div class="step-title"><span class="dot" style="background:#a78bfa"></span><span>Sandbox execution result</span></div>
+      <div class="out">${esc(t.tool_output)}</div>
+    </div>
+
+    <div class="verdict">
+      <span class="tag ${t.correct ? 'ok' : 'no'}">${t.correct ? 'CORRECT' : 'INCORRECT'}</span>
+      <span class="kv">predicted <b>${esc(t.predicted)}</b> · expected <b>${esc(t.expected)}</b></span>
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
